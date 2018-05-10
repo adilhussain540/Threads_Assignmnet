@@ -2,25 +2,25 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-int finalResult = 0;
 int numbers[1000];
 
 void *addNumbers(void *arg)
 {
 	int *Index = (int*)arg;
-	int sum = 0;
+	int *sum = (int*)malloc(sizeof(int));
 	int i = 0;
 	
 	for(i = (*Index)*100; i < (*Index)*100 + 100 ; i++)
 		{
-			sum = sum + numbers[i];	
+			*sum = *sum + numbers[i];	
 		}
-
-	finalResult = finalResult + sum;
+	return (void*)sum;
 }
 
 int main()
 {
+	int finalResult = 0;
+	int *oneResult;
 	int Index[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 	pthread_t threads[10];
 	int i = 0;
@@ -41,7 +41,9 @@ int main()
 
 	for(i; i<10; i++)
 	{
-	pthread_join(threads[i], NULL);
+	pthread_join(threads[i], (void**)&oneResult);
+	finalResult += *oneResult;
+	free(oneResult); 
 	}
 	
 	printf("%d\n", finalResult);
@@ -49,6 +51,5 @@ int main()
 	return 0;
 	
 }
-
 
 
